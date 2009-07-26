@@ -19,6 +19,10 @@
   (type nil :type symbol)
   (point-count nil :type (signed-byte 32)))
 
+(defstruct world-manifold
+  (normal nil :type vec2)
+  (points nil :type (simple-vector 2))) ;b2_maxManifoldPoints = 2
+
 (defstruct aabb
   (lower-bound nil :type vec2)
   (upper-bound nil :type vec2))
