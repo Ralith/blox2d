@@ -23,6 +23,10 @@
   (normal nil :type vec2)
   (points nil :type (simple-vector 2))) ;b2_maxManifoldPoints = 2
 
+(defstruct clip-vertex
+  (vertex nil :type vec2)
+  (id nil :type contact-id))
+
 (defstruct aabb
   (lower-bound nil :type vec2)
   (upper-bound nil :type vec2))
