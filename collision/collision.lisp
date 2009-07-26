@@ -27,6 +27,11 @@
   (vertex nil :type vec2)
   (id nil :type contact-id))
 
+(defstruct ray-cast-input
+  (point1 nil :type vec2)
+  (point2 nil :type vec2)
+  (max-fraction nil :type double-float))
+
 (defstruct aabb
   (lower-bound nil :type vec2)
   (upper-bound nil :type vec2))
