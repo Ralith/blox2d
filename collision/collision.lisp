@@ -32,6 +32,11 @@
   (point2 nil :type vec2)
   (max-fraction nil :type double-float))
 
+(defstruct ray-cast-output
+  (normal nil :type vec2)
+  (fraction nil :type double-float)
+  (hit nil))                            ;bool
+
 (defstruct aabb
   (lower-bound nil :type vec2)
   (upper-bound nil :type vec2))
