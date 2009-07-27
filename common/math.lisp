@@ -107,3 +107,47 @@
   (vec3 (* (vec3-x vec) factor)
         (* (vec3-y vec) factor)
         (* (vec3-z vec) factor)))
+
+
+(defstruct matrix2x2
+  (column1 (vec2 0 0) :type vec2)
+  (column2 (vec2 0 0) :type vec2))
+
+(defparameter +identity2x2+
+  (make-matrix2x2 :column1 (vec2 1 0)
+                  :column2 (vec2 0 1)))
+
+(defun angle->matrix2x2 (angle)
+  (let ((cos (cos angle))
+        (sin (sin angle)))
+    (make-matrix2x2 :column1 (vec2 cos sin)
+                    :column2 (vec2 (- sin) cos))))
+
+(defun matrix2x2->angle (matrix2x2)
+  (atan (vec2-y (matrix2x2-column1 matrix2x2))
+        (vec2-x (matrix2x2-column1 matrix2x2))))
+
+(defun matrix2x2-inverted (matrix2x2)
+  (let ((c1x (vec2-x (matrix2x2-column1 matrix2x2)))
+        (c2x (vec2-x (matrix2x2-column2 matrix2x2)))
+        (c1y (vec2-y (matrix2x2-column1 matrix2x2)))
+        (c2y (vec2-y (matrix2x2-column2 matrix2x2))))
+    (assert (not (= 0.0 (- (* c1x c2y) (* c2x c1y)))))
+    (let ((determinant (/ (- (* c1x c2y) (* c2x c1y)))))
+      (make-matrix2x2 :column1 (vec2 (* determinant c2y)
+                                     (* (- determinant) c1y))
+                      :column2 (vec2 (* (- determinant) c2x)
+                                     (* determinant c1x))))))
+
+(defun matrix2x2-solve (matrix2x2 vec2)
+  (let ((c1x (vec2-x (matrix2x2-column1 matrix2x2)))
+        (c2x (vec2-x (matrix2x2-column2 matrix2x2)))
+        (c1y (vec2-y (matrix2x2-column1 matrix2x2)))
+        (c2y (vec2-y (matrix2x2-column2 matrix2x2))))
+    (assert (not (= 0.0 (- (* c1x c2y) (* c2x c1y)))))
+    (let ((determinant (/ (- (* c1x c2y) (* c2x c1y)))))
+      (vec2 (* determinant (- (* c2y (vec2-x vec2))
+                              (* c2x (vec2-y vec2))))
+            (* determinant (- (* c1x (vec2-y vec2))
+                              (* c1y (vec2-x vec2))))))))
+
