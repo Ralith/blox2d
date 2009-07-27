@@ -1,2 +1,2 @@
 (defpackage :blox2d
-  (use :cl))
+  (:use :cl))
