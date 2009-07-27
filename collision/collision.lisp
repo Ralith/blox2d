@@ -8,8 +8,8 @@
 
 (defstruct manifold-point
   (local-point +zero-vec2+ :type vec2)
-  (normal-impulse 0d0 :type double-float)
-  (tangent-impulse 0d0 :type double-float)
+  (normal-impulse 0.0 :type single-float)
+  (tangent-impulse 0.0 :type single-float)
   (id (make-contact-id) :type contact-id))
 
 (defstruct manifold
@@ -30,11 +30,11 @@
 (defstruct ray-cast-input
   (point1 +zero-vec2+ :type vec2)
   (point2 +zero-vec2+ :type vec2)
-  (max-fraction 0d0 :type double-float))
+  (max-fraction 0.0 :type single-float))
 
 (defstruct ray-cast-output
   (normal +zero-vec2+ :type vec2)
-  (fraction 0d0 :type double-float)
+  (fraction 0.0 :type single-float)
   (hit 0))                            ;bool
 
 (defstruct line-segment
