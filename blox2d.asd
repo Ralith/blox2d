@@ -3,8 +3,9 @@
   :components
   ((:module "common"
             :components
-            ((:file "math")))
+            ((:file "math")
+             (:file "util")))
    (:module "collision"
             :components
             ((:file "collision"
-                    :depends-on ("math"))))))
+                    :depends-on ("math" "util"))))))
