@@ -47,7 +47,7 @@
 
 (defun vec2-normalized (vec)
   (let ((len (vec2-length vec)))
-   (if (= 0.0 len)                      ;TODO: approx. equal
+    (if (> single-float-epsilon len)
        vec
        (let ((inv-length (/ 1 len)))
          (vec2 (* (vec2-x vec) inv-length)
@@ -220,3 +220,12 @@
 (defparameter +identity-transform+
   (make-transform :position (vec2 0 0)
                   :rotation +identity2x2+))
+
+
+(defstruct sweep
+  (center-local (vec2 0 0) :type vec2)
+  (initial-center-world (vec2 0 0) :type vec2)
+  (center-world (vec2 0 0) :type vec2)
+  (initial-angle 0.0 :type single-float)
+  (angle 0.0 :type single-float)
+  (time-interval 0.0 :type single-float))
