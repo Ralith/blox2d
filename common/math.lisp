@@ -208,3 +208,15 @@
                               (* c2x (vec3-y vec2))))
             (* determinant (- (* c1x (vec3-y vec2))
                               (* c1y (vec3-x vec2))))))))
+
+
+(defstruct transform
+  (position (vec2 0 0)
+            :type vec2)
+  (rotation (make-matrix2x2 :column1 (vec2 0 0)
+                            :column2 (vec2 0 0))
+            :type matrix2x2))
+
+(defparameter +identity-transform+
+  (make-transform :position (vec2 0 0)
+                  :rotation +identity2x2+))
