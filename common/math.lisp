@@ -109,6 +109,30 @@
         (* (vec3-z vec) factor)))
 
 
+(defun dot (a b)
+  (apply #'+ (loop
+                for i from 0 to (1- (length a))
+                collecting (* (aref a i) (aref b i)))))
+
+(defun cross2-vv (a b)
+  "Cross product of two vec2s"
+  (- (* (vec2-x a) (vec2-y b)) (* (vec2-y a) (vec2-x b))))
+
+(defun cross2-vs (vec scalar)
+  "Cross product of a vec2 and a scalar"
+  (vec2 (* scalar (vec2-y vec)) (* (- scalar) (vec2-x vec))))
+
+(defun cross2-sv (scalar vec)
+  "Cross product of a scalar and a vec2"
+  (vec2 (* (- scalar) (vec2-y vec)) (* scalar (vec2-x vec))))
+
+(defun cross3-vv (a b)
+  "Cross product of two vec3s"
+  (vec3 (- (* (vec3-y a) (vec3-z b)) (* (vec3-z a) (vec3-y b)))
+        (- (* (vec3-z a) (vec3-x b)) (* (vec3-x a) (vec3-z b)))
+        (- (* (vec3-x a) (vec3-y b)) (* (vec3-y a) (vec3-x b)))))
+
+
 (defstruct matrix2x2
   (column1 (vec2 0 0) :type vec2)
   (column2 (vec2 0 0) :type vec2))
@@ -151,3 +175,36 @@
             (* determinant (- (* c1x (vec2-y vec2))
                               (* c1y (vec2-x vec2))))))))
 
+(defstruct matrix3x3
+  (column1 (vec3 0 0 0) :type vec3)
+  (column2 (vec3 0 0 0) :type vec3)
+  (column3 (vec3 0 0 0) :type vec3))
+
+(defun matrix3x3-solve (matrix3x3 vec3)
+  (let ((determinant (/ (dot (matrix3x3-column1 matrix3x3)
+                             (cross3-vv (matrix3x3-column2 matrix3x3)
+                                        (matrix3x3-column3 matrix3x3))))))
+    (vec3 (* determinant
+             (dot vec3
+                  (cross3-vv (matrix3x3-column2 matrix3x3)
+                             (matrix3x3-column3 matrix3x3))))
+          (* determinant
+             (dot (matrix3x3-column1 matrix3x3)
+                  (cross3-vv vec3
+                             (matrix3x3-column3 matrix3x3))))
+          (* determinant
+             (dot (matrix3x3-column1 matrix3x3)
+                  (cross3-vv (matrix3x3-column2 matrix3x3)
+                             vec3))))))
+
+(defun matrix3x3-solve2x2 (matrix3x3 vec2)
+  (let ((c1x (vec3-x (matrix3x3-column1 matrix3x3)))
+        (c2x (vec3-x (matrix3x3-column2 matrix3x3)))
+        (c1y (vec3-y (matrix3x3-column1 matrix3x3)))
+        (c2y (vec3-y (matrix3x3-column2 matrix3x3))))
+    (assert (not (= 0.0 (- (* c1x c2y) (* c2x c1y)))))
+    (let ((determinant (/ (- (* c1x c2y) (* c2x c1y)))))
+      (vec2 (* determinant (- (* c2y (vec3-x vec2))
+                              (* c2x (vec3-y vec2))))
+            (* determinant (- (* c1x (vec3-y vec2))
+                              (* c1y (vec3-x vec2))))))))
