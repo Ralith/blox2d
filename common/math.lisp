@@ -9,10 +9,10 @@
               :initial-contents (list (float x 1.0) (float y 1.0))))
 
 (defun vec2-x (vec)
-  (elt vec 0))
+  (aref vec 0))
 
 (defun vec2-y (vec)
-  (elt vec 1))
+  (aref vec 1))
 
 (defconstant +zero-vec2+ (vec2 0.0 0.0)
   "The zero vector.")
