@@ -16,8 +16,9 @@
   '(enum :circles :faceA :faceB))
 
 (defstruct manifold
-  (points (make-array 2 :initial-contents (list (vec2 0 0) (vec2 0 0)))
-          :type (simple-array vec2 (2))) ;b2_maxManifoldPoints = 2
+  (points (make-array 2 :initial-contents (list (make-manifold-point)
+                                                (make-manifold-point)))
+          :type (simple-array manifold-point (2))) ;b2_maxManifoldPoints = 2
   (local-plane-normal (vec2 0 0) :type vec2)
   (local-point (vec2 0 0) :type vec2)
   (type :circles :type manifold-type)
@@ -27,6 +28,71 @@
   (normal (vec2 0 0) :type vec2)
   (points (make-array 2 :initial-contents (list (vec2 0 0) (vec2 0 0)))
           :type (simple-array vec2 (2)))) ;b2_maxManifoldPoints = 2
+
+(defun manifold->world-manifold (manifold
+                                 transform1 radius1
+                                 transform2 radius2)
+  (let ((normal) (points (make-array 2 :initial-contents
+                                     (list (vec2 0 0)
+                                           (vec2 0 0))))) ;b2_maxManifoldPoints = 2
+    (when (not (= 0 (manifold-point-count manifold)))
+      (case (manifold-type manifold)
+        (:circles
+         (progn
+           (let ((pointA (transform-mult transform1 (manifold-local-point manifold)))
+                 (pointB (transform-mult transform2 (manifold-point-local-point (aref (manifold-points manifold) 0)))))
+             (if (> (vec2-distance-squared pointA pointB)
+                    (expt single-float-epsilon 2))
+                 (setf normal (vec2-normalized (vec2- pointA pointB)))
+                 (setf normal (vec2 1 0)))
+             (setf (aref points 0) (vec2* (vec2+
+                                           (vec2+ pointA
+                                                  (vec2* normal
+                                                         radius1))
+                                           (vec2- pointB
+                                                  (vec2* normal
+                                                         radius2)))
+                                          0.5)))))
+        (:faceA
+         (progn
+           (setf normal (matrix2x2-mult (transform-rotation transform1)
+                                        (manifold-local-plane-normal manifold)))
+           (dotimes (i (manifold-point-count manifold))
+             (let ((clip-point (transform-mult transform2 (manifold-point-local-point (elt (manifold-points manifold) i)))))
+               (setf (elt (manifold-points manifold) i)
+                     (vec2*
+                      (vec2+
+                       (vec2+
+                        clip-point
+                        (vec2* normal
+                               (- radius1
+                                  (dot
+                                   (- clip-point (transform-mult
+                                                  transform1
+                                                  (manifold-local-point manifold)))
+                                   normal))))
+                       (vec2- clip-point (* radius2 normal)))
+                      0.5))))))
+        (:faceB
+         (progn
+           (setf normal (vec2- (matrix2x2-mult (transform-rotation transform2)
+                                               (manifold-local-plane-normal manifold))))
+           (dotimes (i (manifold-point-count manifold))
+             (let ((clip-point (transform-mult transform1 (manifold-point-local-point (elt (manifold-points manifold) i)))))
+               (setf (elt (manifold-points manifold) i)
+                     (vec2*
+                      (vec2+
+                       (vec2+
+                        clip-point
+                        (vec2* normal
+                               (- radius2
+                                  (dot
+                                   (- clip-point (transform-mult
+                                                  transform2
+                                                  (manifold-local-point manifold)))
+                                   normal))))
+                       (vec2- clip-point (* radius1 normal)))
+                      0.5))))))))))
 
 (deftype point-state ()
   '(enum :null-state :add-state :persist-state :remove-state))
