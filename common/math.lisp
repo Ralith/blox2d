@@ -6,7 +6,7 @@
 (defun vec2 (x y)
   (make-array 2
               :element-type 'single-float
-              :initial-contents (list x y)))
+              :initial-contents (list (float x) (float y))))
 
 (defun vec2-x (vec)
   (elt vec 0))
