@@ -16,7 +16,8 @@
   '(enum :circles :faceA :faceB))
 
 (defstruct manifold
-  (points 0 :type (simple-vector 2))  ;b2_maxManifoldPoints = 2
+  (points (make-array 2 :initial-contents (list (vec2 0 0) (vec2 0 0)))
+          :type (simple-array vec2 (2))) ;b2_maxManifoldPoints = 2
   (local-plane-normal (vec2 0 0) :type vec2)
   (local-point (vec2 0 0) :type vec2)
   (type :circles :type manifold-type)
@@ -24,7 +25,8 @@
 
 (defstruct world-manifold
   (normal (vec2 0 0) :type vec2)
-  (points 0 :type (simple-vector 2))) ;b2_maxManifoldPoints = 2
+  (points (make-array 2 :initial-contents (list (vec2 0 0) (vec2 0 0)))
+          :type (simple-array vec2 (2)))) ;b2_maxManifoldPoints = 2
 
 (deftype point-state ()
   '(enum :null-state :add-state :persist-state :remove-state))
