@@ -13,6 +13,3 @@
 
 (defun vec2-y (vec)
   (aref vec 1))
-
-(defconstant +zero-vec2+ (vec2 0.0 0.0)
-  "The zero vector.")
