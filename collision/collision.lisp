@@ -37,6 +37,10 @@
   (fraction nil :type double-float)
   (hit nil))                            ;bool
 
+(defstruct line-segment
+  (point1 nil :type vec2)
+  (point2 nil :type vec2))
+
 (defstruct aabb
   (lower-bound nil :type vec2)
   (upper-bound nil :type vec2))
