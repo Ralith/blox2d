@@ -7,5 +7,6 @@
              (:file "util")))
    (:module "collision"
             :components
-            ((:file "collision"
-                    :depends-on ("math" "util"))))))
+            ((:file "collision"))
+            :depends-on
+            ("common"))))
