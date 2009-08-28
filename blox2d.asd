@@ -4,6 +4,7 @@
   ((:module "common"
             :components
             ((:file "math")
+             (:file "settings")
              (:file "util")))
    (:module "collision"
             :components
