@@ -132,6 +132,21 @@
   (point1 (vec2 0 0) :type vec2)
   (point2 (vec2 0 0) :type vec2))
 
+(defun test-segments (a b maxLambda)
+  (let* ((s (line-segment-point1 b))
+         (r (vec2- (line-segment-point2 b) s))
+         (d (vec2- (line-segment-point2 a) (line-segment-point1 a)))
+         (n (cross d 1))
+         (k_slop (* 100f0 single-float-epsilon))
+         (denom (- (dot r n)))
+         (b (vec2- s (line-segment-point1 a)))
+         (a (dot b n))
+         (mu2 (+ (* (- (x-coord r)) (y-coord b)) (* (y-coord r) (x-coord b)))))
+    (when (and (> denom k_slop)
+               (and (<= 0f0 a) (<= a (* maxLambda denom)))
+               (and (<= (* (- k_slop) denom) mu2) (<= mu2 (* denom (+ 1f0 k_slop)))))
+      (values t (/ a denom) (vec2-normalized n)))))
+
 (defstruct aabb
   (lower-bound (vec2 0 0) :type vec2)
   (upper-bound (vec2 0 0) :type vec2))
