@@ -16,9 +16,9 @@
   '(enum :circles :faceA :faceB))
 
 (defstruct manifold
-  (points (make-array 2 :initial-contents (list (make-manifold-point)
+  (points (make-array +max-manifold-points+ :initial-contents (list (make-manifold-point)
                                                 (make-manifold-point)))
-          :type (simple-array manifold-point (2))) ;b2_maxManifoldPoints = 2
+          :type (simple-array manifold-point (#.+max-manifold-points+)))
   (local-plane-normal (vec2 0 0) :type vec2)
   (local-point (vec2 0 0) :type vec2)
   (type :circles :type manifold-type)
@@ -26,15 +26,15 @@
 
 (defstruct world-manifold
   (normal (vec2 0 0) :type vec2)
-  (points (make-array 2 :initial-contents (list (vec2 0 0) (vec2 0 0)))
-          :type (simple-array vec2 (2)))) ;b2_maxManifoldPoints = 2
+  (points (make-array +max-manifold-points+
+                      :initial-contents (repeat (vec2 0 0) +max-manifold-points+))
+          :type (simple-array vec2 (#.+max-manifold-points+))))
 
 (defun manifold->world-manifold (manifold
                                  transform1 radius1
                                  transform2 radius2)
-  (let ((normal) (points (make-array 2 :initial-contents
-                                     (list (vec2 0 0)
-                                           (vec2 0 0))))) ;b2_maxManifoldPoints = 2
+  (let ((normal) (points (make-array +max-manifold-points+
+                                     :initial-contents (repeat (vec2 0 0) +max-manifold-points+))))
     (when (not (= 0 (manifold-point-count manifold)))
       (case (manifold-type manifold)
         (:circles
@@ -46,12 +46,8 @@
                  (setf normal (vec2-normalized (vec2- pointA pointB)))
                  (setf normal (vec2 1 0)))
              (setf (aref points 0) (vec2* (vec2+
-                                           (vec2+ pointA
-                                                  (vec2* normal
-                                                         radius1))
-                                           (vec2- pointB
-                                                  (vec2* normal
-                                                         radius2)))
+                                           (vec2+ pointA (vec2* normal radius1))
+                                           (vec2- pointB (vec2* normal radius2)))
                                           0.5)))))
         (:faceA
          (progn
@@ -92,7 +88,8 @@
                                                   (manifold-local-point manifold)))
                                    normal))))
                        (vec2- clip-point (* radius1 normal)))
-                      0.5))))))))))
+                      0.5))))))))
+    (make-world-manifold :normal normal :points points)))
 
 (deftype point-state ()
   '(enum :null-state :add-state :persist-state :remove-state))
