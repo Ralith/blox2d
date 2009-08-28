@@ -6,6 +6,12 @@
   (incident-vertex 0 :type (unsigned-byte 8))
   (flip 0 :type (signed-byte 8)))
 
+(defun contact-id= (a b)
+  (and (= (contact-id-reference-edge a) (contact-id-reference-edge b))
+       (= (contact-id-incident-edge a) (contact-id-incident-edge b))
+       (= (contact-id-incident-vertex a) (contact-id-incident-vertex b))
+       (= (contact-id-flip a) (contact-id-flip b))))
+
 (defstruct manifold-point
   (local-point (vec2 0 0) :type vec2)
   (normal-impulse 0.0 :type single-float)
@@ -92,7 +98,27 @@
     (make-world-manifold :normal normal :points points)))
 
 (deftype point-state ()
-  '(enum :null-state :add-state :persist-state :remove-state))
+  '(enum :null :add :persist :remove))
+
+(defun get-point-states (manifold1 manifold2)
+  (let* ((state1 (make-array +max-manifold-points+
+                            :initial-contents (repeat :null +max-manifold-points+)))
+        (state2 state1))
+    (dotimes (i (manifold-point-count manifold1))
+      (setf (aref state1 i) :remove)
+      (let ((id (manifold-point-id (aref (manifold-points manifold1) i))))
+        (dotimes (j (manifold-point-count manifold2))
+          (when (contact-id= id (manifold-point-id (aref (manifold-points manifold2) j)))
+            (setf (aref state1 i) :persist)
+            (return)))))
+    (dotimes (i (manifold-point-count manifold2))
+      (setf (aref state2 i) :add)
+      (let ((id (manifold-point-id (aref (manifold-points manifold2) i))))
+        (dotimes (j (manifold-point-count manifold1))
+          (when (contact-id= id (manifold-point-id (aref (manifold-points manifold1) j)))
+            (setf (aref state2 i) :persist)
+            (return)))))
+    (list state1 state2)))
 
 (defstruct clip-vertex
   (vertex (vec2 0 0) :type vec2)
