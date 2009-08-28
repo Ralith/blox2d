@@ -112,23 +112,17 @@
      for i from 0 to (1- (length a))
      sum (* (aref a i) (aref b i))))
 
-(defun cross2-vv (a b)
-  "Cross product of two vec2s"
-  (- (* (x-coord a) (y-coord b)) (* (y-coord a) (x-coord b))))
-
-(defun cross2-vs (vec scalar)
-  "Cross product of a vec2 and a scalar"
-  (vec2 (* scalar (y-coord vec)) (* (- scalar) (x-coord vec))))
-
-(defun cross2-sv (scalar vec)
-  "Cross product of a scalar and a vec2"
-  (vec2 (* (- scalar) (y-coord vec)) (* scalar (x-coord vec))))
-
-(defun cross3-vv (a b)
-  "Cross product of two vec3s"
-  (vec3 (- (* (y-coord a) (z-coord b)) (* (z-coord a) (y-coord b)))
-        (- (* (z-coord a) (x-coord b)) (* (x-coord a) (z-coord b)))
-        (- (* (x-coord a) (y-coord b)) (* (y-coord a) (x-coord b)))))
+(defun cross (a b)
+  "Cross product"
+  (typecase a
+    (vec2 (typecase b
+            (vec2 (- (* (x-coord a) (y-coord b)) (* (y-coord a) (x-coord b))))
+            (number (vec2 (* b (y-coord a)) (* (- b) (x-coord a))))))
+    (number (typecase b
+              (vec2 (vec2 (* (- a) (y-coord b)) (* a (x-coord b))))))
+    (vec3 (vec3 (- (* (y-coord a) (z-coord b)) (* (z-coord a) (y-coord b)))
+                (- (* (z-coord a) (x-coord b)) (* (x-coord a) (z-coord b)))
+                (- (* (x-coord a) (y-coord b)) (* (y-coord a) (x-coord b)))))))
 
 (defun vec2-distance (a b)
   (vec2-length (vec2- a b)))
