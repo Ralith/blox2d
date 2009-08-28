@@ -115,6 +115,6 @@
   (point1 (vec2 0 0) :type vec2)
   (point2 (vec2 0 0) :type vec2))
 
-(defstruct axis-aligned-bounding-box
+(defstruct aabb
   (lower-bound (vec2 0 0) :type vec2)
   (upper-bound (vec2 0 0) :type vec2))
